@@ -14,7 +14,6 @@
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="I2C Bus.lvclass" Type="LVClass" URL="../I2C Bus Interface/I2C Bus.lvclass"/>
 		<Item Name="MCP23017 Datasheet.pdf" Type="Document" URL="../MCP23017 Datasheet.pdf"/>
-		<Item Name="GPIO Channel.ctl" Type="VI" URL="../GPIO Channel.ctl"/>
 		<Item Name="Demo.vi" Type="VI" URL="../Demo.vi"/>
 		<Item Name="MCP23017 Test.lvclass" Type="LVClass" URL="../../tests/MCP23017 Test/MCP23017 Test.lvclass"/>
 		<Item Name="Mock I2C Bus.lvclass" Type="LVClass" URL="../../tests/Mock I2C Bus/Mock I2C Bus.lvclass"/>
