@@ -25,4 +25,4 @@ To get going:
 1. Fork or clone this repository
 1. Install the tools using the provided vipc file
 1. Checkout the `exercise-starting-point` branch
-1. Follow the instructions from here
+1. Follow the instructions from [here](https://astemes.github.io/astemes-mocking-exercise/)
