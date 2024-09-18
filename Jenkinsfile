@@ -27,11 +27,6 @@ pipeline {
 			}
 		}
 		stage('Deploy') {
-			when{
-				expression{
-					!COMMIT_TAG.isEmpty()
-				}
-			}
 			environment{
 				GITHUB_TOKEN = credentials('github-token')
 			}
