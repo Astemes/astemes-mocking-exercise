@@ -271,7 +271,7 @@ You should see it failing (obviously), but this is a good check to see that you 
 <p>Next, let's consider what we should be testing.
 Reading into the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
 The register is a 8-bit, single byte, register and we will need to write a <code>0x00</code> to the register.</p>
-<p><img alt="IODIR" src="./img/iodir-registers.png"/></p>
+<p><img alt="IODIR" src="img/IODIR-registers.png"/></p>
 <p>Now, how can we test this?
 We can see that IODIRA is located at register address <code>0x00</code> and we will for now assume that the device uses I2C address of <code>0</code> (we'll get back to revisit this later).
 So we need to verify that when initializing our driver for the MCP23017, the two bytes [<code>0x00</code>, <code>0x00</code>] are written to device address <code>0</code>.
