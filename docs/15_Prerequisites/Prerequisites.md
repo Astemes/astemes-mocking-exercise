@@ -7,6 +7,7 @@ The option for using hardware is to reinforce the learning and receiving a dopam
 
 To get started you will need to have LabVIEW installed get the tools setup. 
 Follow these steps if you do not already have everything ready. 
+
 1. Install LabVIEW 2020 or later
 1. Clone the exercise branch of the repository 
 1. Install the tools in the .vipc file found at the top level of the repository 
