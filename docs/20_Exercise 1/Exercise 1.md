@@ -217,18 +217,33 @@ And now, we only have one problem left.
 We only have one state so far, but we have two ports.
 So updating one port will mirror to the other, as is shown by this failing test.
 
-![Test 8](img/test)
+![Test 8](img/Test1-8.png)
 
 If it is not clear what failed, have a look at the failure description. 
 `Address: 34(U8) == 34(U8), Data: [19, 2](U8) != [19, 3](U8), error in (no error): No Error(Cluster) == No Error(Cluster)`
 The value written to the B port should have been 2 (binary `0b10`), but we got the first bit mirrored from port A.
 To resolve this, you will need to make the states specific to each port.
 At this point I actually decided to inline the "Channel to Register.vi", and this is normal during refactoring.
-Something which made sens 10 minutes ago might not have been such a good idea after all.
+Something which made sense 10 minutes ago might not have been such a good idea after all.
 
 
 ## Final thoughts
 
 At this point we have fully implemented the functionality needed to use the MCP23017 as a digital output device.
-If you wanted to use the B port as output, that too would need to be configured on creation.
+If you have the hardware setup, chances are high that you will be able to toggle a LED.
+You probably did not have to do a lot of debugging, as the steps we took were so small that there should not have been much to debug.
+
+Keeping all the previous tests passing, we could focus on adding a tiny bit of functionality, while still keeping everything working.
+This allowed us to make steady progress and allowed us to focus on one piece at at time.
+The design that emerged is quite clean and the code is very readable, due to our constant refactoring efforts.
+When you get experienced, you are able to control the step size and adjust as you go.
+
+As we did test every little bit of code we added, the test coverage is 100%.
+Because we have seen every test fail, we can be very confident that the tests actually works and tests something useful.
+
+This same technique works on all different levels of a software system, as well designed software is fractal in nature.
+Different levels of abstraction should be separated by abstractions, through interfaces, which serves as our architectural boundaries.
+These boundaries are natural seems where we can inject test doubles, but also augment the behavior of our system - without changing it.
+
+One thing to note is that if you wanted to use the B port as output, that too would need to be configured on creation the same way we did in our first test.
 I plan to continue this exercise to show how we can implement port B as an input, if there is any interest for such an exercise.
