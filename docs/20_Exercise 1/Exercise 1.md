@@ -34,7 +34,7 @@ Next, let's consider what we should be testing.
 Reading to the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
 The register is a 8-bit, single byte, register and we will need to write a `0x00` to the register.
 
-![Directory Structure](./img/iodir-registers.png)
+![IODIR](./img/iodir-registers.png)
 
 Now, how can we test this?
 We can see that IODIRA is located at register address `0x00` and we will for now assume that the device uses I2C address of `0` (we'll get back to revisit this later).
