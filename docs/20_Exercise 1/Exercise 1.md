@@ -26,12 +26,14 @@ We will keep the *tests* directory on the same level as the *source* directory a
 ![Directory Structure](./img/folder-structure.png)
 
 Now, create a new test method by right clicking the `Test Method Template.vit` in the project and select `New from Template`.
-Save the VI and run it, at this point the name does not matter as long as it begins with the four letters `test`. 
+Save the VI and run it.
+At this point the name does not matter as long as it begins with the four letters `test`. 
 You should see it failing (obviously), but this is a good check to see that you have the tools setup and working.
+
 You can also run all tests in the project from the toolbar button.
 
 Next, let's consider what we should be testing.
-Reading to the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
+Reading into the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
 The register is a 8-bit, single byte, register and we will need to write a `0x00` to the register.
 
 ![IODIR](./img/iodir-registers.png)
@@ -39,6 +41,7 @@ The register is a 8-bit, single byte, register and we will need to write a `0x00
 Now, how can we test this?
 We can see that IODIRA is located at register address `0x00` and we will for now assume that the device uses I2C address of `0` (we'll get back to revisit this later).
 So we need to verify that when initializing our driver for the MCP23017, the two bytes [`0x00`, `0x00`] are written to device address `0`.
+The first of these bytes represents the register address we want to write to and the second byte is the actual data.
 
 To achieve this, let us begin by creating a mock of the I2C bus.
 Do this by right clicking the I2C Bus interface in the LabVIEW project and select `Mock...`.
@@ -57,6 +60,7 @@ You should se a failing text with a description as below.
 ![First test failing](./img/Test1-1-failing.png)
 
 View the description reported by the mock verification and make sure you understand how this test works.
+If it is unclear, please refer to the [LMock Documentation](https://lmock.astemes.com/).
 The test can, of course, not pass yet as we have nothing acting on the I2C Bus, so the declared expectation cannot be fulfilled.
 
 After some work we have finally arrived at a failing test that actually tests something useful.
@@ -82,11 +86,12 @@ Feel free to work the code until it is readable, but here are some ideas on what
 - The code setting the IODIRA register would go well in a subVI with an appropriate name. This VI should be made private to the class.
 - The array of bytes fed to the I2C `Write.vi` contains some magic numbers. You could replace the first byte with something more readable, such as a ring or enum.
 - If you decide to create a ring representing the register address, it should be made into a private type definition of the class.
-- Avoid adding more than the first element to the ring for now. We still do not know which registers we are going to address and by only adding the ones we need there is a minimal amount of code we need to change later if we change our minds. Also adding registers we are not yet supporting will make the API confusing as we would need to know about the implementation in order to know which registers we may call. 
+- Avoid adding more than the first one or two elements to the ring for now. We still do not know which registers we are going to address and by only adding the ones we need there is a minimal amount of code we need to change later if we change our minds.
+- Also adding registers we are not yet using can make the code confusing. It turns out that IODIRA and IODIRB works analogously, but if we were uncertain we could add only IODIRA for now.
 - Once you have replaced the first `0x00` with something readable, you should be able to identify a chunk of code making a nice subVI. 
 
 The last VI would actually encapsulate a core concept, which we will leverage moving forward.
-A suitable name for the VI would be `Write Registers.vi`, and ths should also be private to the class.
+A suitable name for the VI would be `Write Registers.vi`, and this should also be private to the class.
 It would look something like below.
 
 ![Write Registers.vi](./img/Refactoring1.png)
@@ -96,14 +101,14 @@ In this way you can be sure you are not changing the behavior.
 
 If the above was unclear, you can always check out the `solution` branch and revert to the commit called "Refactoring after first Test".
 
-## Addressing Addressing Issues
+## Addressing the Addressing Issue
 
 Now we have managed to write the IODIRA register, but we took some shortcuts.
-One thing we did was hardcode the I2C address of the MCP23017, let us address this.
+One thing we did was hardcode the I2C address of the MCP23017, let us resolve this.
 
-The address of the device can be configured by pulling the addressing pins of the device either high or low.
+The address of the device can be configured by pulling the address programming pins of the device either high or low.
 There are three bits, allowing for 8 different addresses.
-Refer to the datasheet for details, but for now we need to consider the figure below.
+Refer to the datasheet for details, but for now it is enough to consider the figure below.
 
 ![I2C addressing](./img/I2C-addressing.png)
 
@@ -120,37 +125,43 @@ This should again be trivial - update the value of the constant from earlier.
 
 Now, we still have the address hard coded (unless you did more than you needed to earlier).
 To resolve this, we need to add another test showing what should happen for *e.g.* address 2.
-A pro-tip here is to save a copy of the previous test, as this will just be a slight variation of it.
+After this you will now have two test VI:s in your test case class.
+A pro-tip here is to save a copy of the previous test to save some time, as this will just be a slight variation of it.
 
 ![Test 2](img/Test1-2.png)
 
 Now we have a failing test and we need to actually use the value of the address provided to the constructor in order to make both our tests pass.
-The implementation should be straight forward, but if you need help look at the "Test 2 Passing" commit of the solution branch.
+Remember, you are not allowed at any point to make an earlier test fail.
+The implementation should be straight forward.
+If you need help, look at the "Test 2 Passing" commit of the solution branch.
 Not much refactoring to do, so let us move on to the next test.
 
 ## Controlling the Outputs
 
-Now when we have the port configured as an output, we can start updating it by simply writing to the GPIOA register `0x12`.
+Now when we have the port configured as an output, we can start updating it by simply writing to the GPIOA register at `0x12`.
 Reading the datasheet we discover that this is done similar to earlier, by first setting the register pointer and then setting the value.
+
 As a requirement, we will assume that we want to be able to set the bits individually and not write the whole port at once.
 This will impact what our API looks like and will require us to handle the state of the port somehow, but we will consider that later. 
 Baby steps.
 
 A good first test would be to set GPIOA0, which is the first bit on the A port, to 1.
-We will now need to add a second public VI to our class and the API could look like below, using the enum type definition provided with the project.
+We will now need to add a second public VI to our class and the API could look like below.
+Feel free to use the type defined enum provided with the project to represent the GPIO channels.
 
 ![api](img/api.png)
 
-The test would look like below.
+Our next test would look like below.
 
 ![Test3](img/Test1-3.png)
 
 Making this test pass is again easy. 
 Remember, it is okay to just use constants on the block diagram as long as all tests still pass.
 Depending on how you solved it, there might be opportunity for refactoring.
+
 Keep in mind that we already created a VI for setting a register and a type for the register address.
-The type can be extended and the VI can be reduced, and the result is that we have no duplication of logic.
-If we would not have discovered the refactoring opportunity after the first test, we would likely sense it now as the logic is the same for setting the registers.
+The type can be extended and the VI can be reused, and the result is that we have no duplication of logic.
+If we would *not* have discovered the refactoring opportunity after the first test, we would likely sense it now as the logic is the same for setting the registers.
 
 ## Adding more Tests
 
@@ -167,10 +178,12 @@ In this case we will get a test like below.
 
 ![test5](img/Test1-5.png)
 
-Now there is actually two different things making this test fail.
-The register needs to be `0x13` and there will be an overflow on the byte and we need to add some kind of modulo operation.
+There is actually two different things making this test fail.
+The register needs to be `0x13` and there will be an overflow on the byte data type setting the register.
+We will need to add some kind of modulo operation to resolve this.
+
 When you have the test passing, the block diagram is getting a bit crowded and it is good time to do some refactoring.
-You could identify the "Channel to Bitmask.vi" and "Channel to Register.vi" as shown below.
+You could identify the "Channel to Bitmask.vi" and "Channel to Register.vi" in the "Set GPIO State.vi",as shown below.
 
 ![test5 refactor](img/post-test5-refactor.png)
 
@@ -183,24 +196,28 @@ This is shown by the test below.
 
 ![test6](img/Test1-6.png)
 
+The reason it fails is  because the second write will be setting `0b10`, as it is not aware that the 0th bit should also be high.
 In order to make this one pass, we will need to track the state.
 The "Channel to Bitmask.vi" comes in handy.
 
 Once you have got that one passing, there is not much left.
 Except, we cannot set a bit low.
-That is silly and the test below should fail.
+That is a bit silly, and the test below fails.
 
 ![test7](img/Test1-7.png)
 
+In order to make this pass, we will need to actually look at the value of the boolean `State` input to the "Set GPIO State.vi".
 Once we have the test passing we can again start to consider the structure of the code and improve the readability.
-By separating the calculation of the state from the call to the I2C bus, the operation may be split into two parts as below.
+By separating the calculation of the state from the call to the I2C bus, the operation handled by the "Set GPIO State.vi" may be split into two parts as below.
 
 ![test7 refactor](img/Test1-7-refactor.png)
 
+This quite readable.
 And now, we only have one problem left.
-We only have one state, but two ports.
+We only have one state so far, but we have two ports.
 So updating one port will mirror to the other, as is shown by this failing test.
 
+![Test 8](img/test)
 
 If it is not clear what failed, have a look at the failure description. 
 `Address: 34(U8) == 34(U8), Data: [19, 2](U8) != [19, 3](U8), error in (no error): No Error(Cluster) == No Error(Cluster)`
