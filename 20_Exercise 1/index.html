@@ -155,8 +155,8 @@
   </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#addressing-addressing-issues">
-    Addressing Addressing Issues
+<a class="md-nav__link" href="#addressing-the-addressing-issue">
+    Addressing the Addressing Issue
   </a>
 </li>
 <li class="md-nav__item">
@@ -182,25 +182,10 @@
 </ul>
 </nav>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4">
-          License
-          <span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-label="License" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_4">
-<span class="md-nav__icon md-icon"></span>
-          License
-        </label>
-<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../90_License/10_Astemes%20Mocking%20Exercise/LICENSE/">
-        Astemes Mocking Exercise
+<a class="md-nav__link" href="../90_License/LICENSE/">
+        License
       </a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>
@@ -227,8 +212,8 @@
   </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#addressing-addressing-issues">
-    Addressing Addressing Issues
+<a class="md-nav__link" href="#addressing-the-addressing-issue">
+    Addressing the Addressing Issue
   </a>
 </li>
 <li class="md-nav__item">
@@ -279,16 +264,18 @@ To do this, click on the New LUnit Test Case button in the toolbar and name it <
 <p>We will keep the <em>tests</em> directory on the same level as the <em>source</em> directory and the test case should be saved within the directory.</p>
 <p><img alt="Directory Structure" src="img/folder-structure.png"/></p>
 <p>Now, create a new test method by right clicking the <code>Test Method Template.vit</code> in the project and select <code>New from Template</code>.
-Save the VI and run it, at this point the name does not matter as long as it begins with the four letters <code>test</code>. 
-You should see it failing (obviously), but this is a good check to see that you have the tools setup and working.
-You can also run all tests in the project from the toolbar button.</p>
+Save the VI and run it.
+At this point the name does not matter as long as it begins with the four letters <code>test</code>. 
+You should see it failing (obviously), but this is a good check to see that you have the tools setup and working.</p>
+<p>You can also run all tests in the project from the toolbar button.</p>
 <p>Next, let's consider what we should be testing.
-Reading to the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
+Reading into the datasheet we can see that the IODIR registers IODIRA and IODIRB needs to be configured to make the pins working as outputs.
 The register is a 8-bit, single byte, register and we will need to write a <code>0x00</code> to the register.</p>
 <p><img alt="IODIR" src="./img/iodir-registers.png"/></p>
 <p>Now, how can we test this?
 We can see that IODIRA is located at register address <code>0x00</code> and we will for now assume that the device uses I2C address of <code>0</code> (we'll get back to revisit this later).
-So we need to verify that when initializing our driver for the MCP23017, the two bytes [<code>0x00</code>, <code>0x00</code>] are written to device address <code>0</code>.</p>
+So we need to verify that when initializing our driver for the MCP23017, the two bytes [<code>0x00</code>, <code>0x00</code>] are written to device address <code>0</code>.
+The first of these bytes represents the register address we want to write to and the second byte is the actual data.</p>
 <p>To achieve this, let us begin by creating a mock of the I2C bus.
 Do this by right clicking the I2C Bus interface in the LabVIEW project and select <code>Mock...</code>.</p>
 <p><img alt="Mock I2C Bus" src="img/mock-i2c.png"/></p>
@@ -300,6 +287,7 @@ You will find the <code>Create.vi</code> and <code>Write.vi</code> in the genera
 You should se a failing text with a description as below.</p>
 <p><img alt="First test failing" src="img/Test1-1-failing.png"/></p>
 <p>View the description reported by the mock verification and make sure you understand how this test works.
+If it is unclear, please refer to the <a href="https://lmock.astemes.com/">LMock Documentation</a>.
 The test can, of course, not pass yet as we have nothing acting on the I2C Bus, so the declared expectation cannot be fulfilled.</p>
 <p>After some work we have finally arrived at a failing test that actually tests something useful.
 Except we are not calling any of our code - we have not even written any code yet!
@@ -319,22 +307,23 @@ Feel free to work the code until it is readable, but here are some ideas on what
 <li>The code setting the IODIRA register would go well in a subVI with an appropriate name. This VI should be made private to the class.</li>
 <li>The array of bytes fed to the I2C <code>Write.vi</code> contains some magic numbers. You could replace the first byte with something more readable, such as a ring or enum.</li>
 <li>If you decide to create a ring representing the register address, it should be made into a private type definition of the class.</li>
-<li>Avoid adding more than the first element to the ring for now. We still do not know which registers we are going to address and by only adding the ones we need there is a minimal amount of code we need to change later if we change our minds. Also adding registers we are not yet supporting will make the API confusing as we would need to know about the implementation in order to know which registers we may call. </li>
+<li>Avoid adding more than the first one or two elements to the ring for now. We still do not know which registers we are going to address and by only adding the ones we need there is a minimal amount of code we need to change later if we change our minds.</li>
+<li>Also adding registers we are not yet using can make the code confusing. It turns out that IODIRA and IODIRB works analogously, but if we were uncertain we could add only IODIRA for now.</li>
 <li>Once you have replaced the first <code>0x00</code> with something readable, you should be able to identify a chunk of code making a nice subVI. </li>
 </ul>
 <p>The last VI would actually encapsulate a core concept, which we will leverage moving forward.
-A suitable name for the VI would be <code>Write Registers.vi</code>, and ths should also be private to the class.
+A suitable name for the VI would be <code>Write Registers.vi</code>, and this should also be private to the class.
 It would look something like below.</p>
 <p><img alt="Write Registers.vi" src="img/Refactoring1.png"/></p>
 <p>You should do the refactoring in small steps and always run all tests touching the refactored code between each change.
 In this way you can be sure you are not changing the behavior.</p>
 <p>If the above was unclear, you can always check out the <code>solution</code> branch and revert to the commit called "Refactoring after first Test".</p>
-<h2 id="addressing-addressing-issues">Addressing Addressing Issues</h2>
+<h2 id="addressing-the-addressing-issue">Addressing the Addressing Issue</h2>
 <p>Now we have managed to write the IODIRA register, but we took some shortcuts.
-One thing we did was hardcode the I2C address of the MCP23017, let us address this.</p>
-<p>The address of the device can be configured by pulling the addressing pins of the device either high or low.
+One thing we did was hardcode the I2C address of the MCP23017, let us resolve this.</p>
+<p>The address of the device can be configured by pulling the address programming pins of the device either high or low.
 There are three bits, allowing for 8 different addresses.
-Refer to the datasheet for details, but for now we need to consider the figure below.</p>
+Refer to the datasheet for details, but for now it is enough to consider the figure below.</p>
 <p><img alt="I2C addressing" src="img/I2C-addressing.png"/></p>
 <p>Looking at this we see that our code written earlier is actually wrong.
 When the registers are all pulled low, we do not get an I2C address of 0: we get the address 0 masked with the binary number <code>0b00100000</code>.
@@ -346,28 +335,32 @@ Now the test fails again and we should make it pass.
 This should again be trivial - update the value of the constant from earlier.</p>
 <p>Now, we still have the address hard coded (unless you did more than you needed to earlier).
 To resolve this, we need to add another test showing what should happen for <em>e.g.</em> address 2.
-A pro-tip here is to save a copy of the previous test, as this will just be a slight variation of it.</p>
+After this you will now have two test VI:s in your test case class.
+A pro-tip here is to save a copy of the previous test to save some time, as this will just be a slight variation of it.</p>
 <p><img alt="Test 2" src="img/Test1-2.png"/></p>
 <p>Now we have a failing test and we need to actually use the value of the address provided to the constructor in order to make both our tests pass.
-The implementation should be straight forward, but if you need help look at the "Test 2 Passing" commit of the solution branch.
+Remember, you are not allowed at any point to make an earlier test fail.
+The implementation should be straight forward.
+If you need help, look at the "Test 2 Passing" commit of the solution branch.
 Not much refactoring to do, so let us move on to the next test.</p>
 <h2 id="controlling-the-outputs">Controlling the Outputs</h2>
-<p>Now when we have the port configured as an output, we can start updating it by simply writing to the GPIOA register <code>0x12</code>.
-Reading the datasheet we discover that this is done similar to earlier, by first setting the register pointer and then setting the value.
-As a requirement, we will assume that we want to be able to set the bits individually and not write the whole port at once.
+<p>Now when we have the port configured as an output, we can start updating it by simply writing to the GPIOA register at <code>0x12</code>.
+Reading the datasheet we discover that this is done similar to earlier, by first setting the register pointer and then setting the value.</p>
+<p>As a requirement, we will assume that we want to be able to set the bits individually and not write the whole port at once.
 This will impact what our API looks like and will require us to handle the state of the port somehow, but we will consider that later. 
 Baby steps.</p>
 <p>A good first test would be to set GPIOA0, which is the first bit on the A port, to 1.
-We will now need to add a second public VI to our class and the API could look like below, using the enum type definition provided with the project.</p>
+We will now need to add a second public VI to our class and the API could look like below.
+Feel free to use the type defined enum provided with the project to represent the GPIO channels.</p>
 <p><img alt="api" src="img/api.png"/></p>
-<p>The test would look like below.</p>
+<p>Our next test would look like below.</p>
 <p><img alt="Test3" src="img/Test1-3.png"/></p>
 <p>Making this test pass is again easy. 
 Remember, it is okay to just use constants on the block diagram as long as all tests still pass.
-Depending on how you solved it, there might be opportunity for refactoring.
-Keep in mind that we already created a VI for setting a register and a type for the register address.
-The type can be extended and the VI can be reduced, and the result is that we have no duplication of logic.
-If we would not have discovered the refactoring opportunity after the first test, we would likely sense it now as the logic is the same for setting the registers.</p>
+Depending on how you solved it, there might be opportunity for refactoring.</p>
+<p>Keep in mind that we already created a VI for setting a register and a type for the register address.
+The type can be extended and the VI can be reused, and the result is that we have no duplication of logic.
+If we would <em>not</em> have discovered the refactoring opportunity after the first test, we would likely sense it now as the logic is the same for setting the registers.</p>
 <h2 id="adding-more-tests">Adding more Tests</h2>
 <p>We are able to set the first bit on the A port, but that is not good enough.
 Let us add another test to set another bit.
@@ -377,10 +370,11 @@ The choice of which bit is arbitrary, but it is usually good to check edge cases
 <p>The next thing to could be to write to the B port.
 In this case we will get a test like below.</p>
 <p><img alt="test5" src="img/Test1-5.png"/></p>
-<p>Now there is actually two different things making this test fail.
-The register needs to be <code>0x13</code> and there will be an overflow on the byte and we need to add some kind of modulo operation.
-When you have the test passing, the block diagram is getting a bit crowded and it is good time to do some refactoring.
-You could identify the "Channel to Bitmask.vi" and "Channel to Register.vi" as shown below.</p>
+<p>There is actually two different things making this test fail.
+The register needs to be <code>0x13</code> and there will be an overflow on the byte data type setting the register.
+We will need to add some kind of modulo operation to resolve this.</p>
+<p>When you have the test passing, the block diagram is getting a bit crowded and it is good time to do some refactoring.
+You could identify the "Channel to Bitmask.vi" and "Channel to Register.vi" in the "Set GPIO State.vi",as shown below.</p>
 <p><img alt="test5 refactor" src="img/post-test5-refactor.png"/></p>
 <h2 id="setting-multiple-bits">Setting Multiple Bits</h2>
 <p>So far, so good. 
@@ -388,27 +382,42 @@ But we still have a problem.
 If we were to set two bits in the same port, the second operation would undo the first.
 This is shown by the test below.</p>
 <p><img alt="test6" src="img/Test1-6.png"/></p>
-<p>In order to make this one pass, we will need to track the state.
+<p>The reason it fails is  because the second write will be setting <code>0b10</code>, as it is not aware that the 0th bit should also be high.
+In order to make this one pass, we will need to track the state.
 The "Channel to Bitmask.vi" comes in handy.</p>
 <p>Once you have got that one passing, there is not much left.
 Except, we cannot set a bit low.
-That is silly and the test below should fail.</p>
+That is a bit silly, and the test below fails.</p>
 <p><img alt="test7" src="img/Test1-7.png"/></p>
-<p>Once we have the test passing we can again start to consider the structure of the code and improve the readability.
-By separating the calculation of the state from the call to the I2C bus, the operation may be split into two parts as below.</p>
+<p>In order to make this pass, we will need to actually look at the value of the boolean <code>State</code> input to the "Set GPIO State.vi".
+Once we have the test passing we can again start to consider the structure of the code and improve the readability.
+By separating the calculation of the state from the call to the I2C bus, the operation handled by the "Set GPIO State.vi" may be split into two parts as below.</p>
 <p><img alt="test7 refactor" src="img/Test1-7-refactor.png"/></p>
-<p>And now, we only have one problem left.
-We only have one state, but two ports.
+<p>This quite readable.
+And now, we only have one problem left.
+We only have one state so far, but we have two ports.
 So updating one port will mirror to the other, as is shown by this failing test.</p>
+<p><img alt="Test 8" src="img/Test1-8.png"/></p>
 <p>If it is not clear what failed, have a look at the failure description. 
 <code>Address: 34(U8) == 34(U8), Data: [19, 2](U8) != [19, 3](U8), error in (no error): No Error(Cluster) == No Error(Cluster)</code>
 The value written to the B port should have been 2 (binary <code>0b10</code>), but we got the first bit mirrored from port A.
 To resolve this, you will need to make the states specific to each port.
 At this point I actually decided to inline the "Channel to Register.vi", and this is normal during refactoring.
-Something which made sens 10 minutes ago might not have been such a good idea after all.</p>
+Something which made sense 10 minutes ago might not have been such a good idea after all.</p>
 <h2 id="final-thoughts">Final thoughts</h2>
 <p>At this point we have fully implemented the functionality needed to use the MCP23017 as a digital output device.
-If you wanted to use the B port as output, that too would need to be configured on creation.
+If you have the hardware setup, chances are high that you will be able to toggle a LED.
+You probably did not have to do a lot of debugging, as the steps we took were so small that there should not have been much to debug.</p>
+<p>Keeping all the previous tests passing, we could focus on adding a tiny bit of functionality, while still keeping everything working.
+This allowed us to make steady progress and allowed us to focus on one piece at at time.
+The design that emerged is quite clean and the code is very readable, due to our constant refactoring efforts.
+When you get experienced, you are able to control the step size and adjust as you go.</p>
+<p>As we did test every little bit of code we added, the test coverage is 100%.
+Because we have seen every test fail, we can be very confident that the tests actually works and tests something useful.</p>
+<p>This same technique works on all different levels of a software system, as well designed software is fractal in nature.
+Different levels of abstraction should be separated by abstractions, through interfaces, which serves as our architectural boundaries.
+These boundaries are natural seems where we can inject test doubles, but also augment the behavior of our system - without changing it.</p>
+<p>One thing to note is that if you wanted to use the B port as output, that too would need to be configured on creation the same way we did in our first test.
 I plan to continue this exercise to show how we can implement port B as an input, if there is any interest for such an exercise.</p>
 </article>
 </div>
@@ -429,13 +438,13 @@ I plan to continue this exercise to show how we can implement port B as an input
             </div>
 </div>
 </a>
-<a aria-label="Next: Astemes Mocking Exercise" class="md-footer__link md-footer__link--next" href="../90_License/10_Astemes%20Mocking%20Exercise/LICENSE/" rel="next">
+<a aria-label="Next: License" class="md-footer__link md-footer__link--next" href="../90_License/LICENSE/" rel="next">
 <div class="md-footer__title">
 <div class="md-ellipsis">
 <span class="md-footer__direction">
                 Next
               </span>
-              Astemes Mocking Exercise
+              License
             </div>
 </div>
 <div class="md-footer__button md-icon">

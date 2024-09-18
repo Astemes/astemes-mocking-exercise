@@ -126,34 +126,60 @@
 </li>
 <li class="md-nav__item md-nav__item--active">
 <input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          Prerequisites
+          <span class="md-nav__icon md-icon"></span>
+</label>
 <a class="md-nav__link md-nav__link--active" href="./">
         Prerequisites
       </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#software">
+    Software
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#hardware">
+    Hardware
+  </a>
+<nav aria-label="Hardware" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mcp23017-io-expander">
+    MCP23017 I/O Expander
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#raspberry-pi-pico-micro-controller">
+    Raspberry Pi Pico Micro Controller
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#accessories">
+    Accessories
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../20_Exercise%201/">
         Exercise 1
       </a>
 </li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4">
-          License
-          <span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-label="License" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_4">
-<span class="md-nav__icon md-icon"></span>
-          License
-        </label>
-<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../90_License/10_Astemes%20Mocking%20Exercise/LICENSE/">
-        Astemes Mocking Exercise
+<a class="md-nav__link" href="../../90_License/LICENSE/">
+        License
       </a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>
@@ -164,6 +190,41 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#software">
+    Software
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#hardware">
+    Hardware
+  </a>
+<nav aria-label="Hardware" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mcp23017-io-expander">
+    MCP23017 I/O Expander
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#raspberry-pi-pico-micro-controller">
+    Raspberry Pi Pico Micro Controller
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#accessories">
+    Accessories
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
 </nav>
 </div>
 </div>
@@ -174,6 +235,9 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"></path></svg>
 </a>
 <h1 id="prerequisites">Prerequisites</h1>
+<p>The exercise may be completed without any hardware. 
+The option for using hardware is to reinforce the learning and receiving a dopamine kick from making some LEDs blink.</p>
+<h2 id="software">Software</h2>
 <p>To get started you will need to have LabVIEW installed get the tools setup. 
 Follow these steps if you do not already have everything ready. 
 Install LabVIEW 2020 or later
@@ -181,6 +245,17 @@ Clone the exercise branch of the repository
 Install the tools in the .vipc file found at the top level of the repository 
 If you are new to LUnit, watch the instruction on this link</p>
 <p>The .vipc file will install LUnit and LMock using VIPM. </p>
+<h2 id="hardware">Hardware</h2>
+<p>If you want to make a setup for using the code developed during the exercise and make some LEDs blink you will need the following.
+It will cost you less than 10 € and take a couple of minutes to setup.</p>
+<h3 id="mcp23017-io-expander">MCP23017 I/O Expander</h3>
+<p>This is a common chip which you can get in a dip package to be mounted directly on a breadboard.
+You can also get a breakout board version like <a href="https://www.adafruit.com/product/5346">this</a>.</p>
+<h3 id="raspberry-pi-pico-micro-controller">Raspberry Pi Pico Micro Controller</h3>
+<p>The Pico is used as an I2C master which talks to the I/O expander.
+CTI firmware support to be added soon.</p>
+<h3 id="accessories">Accessories</h3>
+<p>You will need some wires, a usb-cable for the pico and some LEDs to connect to the outputs.</p>
 </article>
 </div>
 </div>
