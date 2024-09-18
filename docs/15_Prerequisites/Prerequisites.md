@@ -7,10 +7,10 @@ The option for using hardware is to reinforce the learning and receiving a dopam
 
 To get started you will need to have LabVIEW installed get the tools setup. 
 Follow these steps if you do not already have everything ready. 
-Install LabVIEW 2020 or later
-Clone the exercise branch of the repository 
-Install the tools in the .vipc file found at the top level of the repository 
-If you are new to LUnit, watch the instruction on this link
+1. Install LabVIEW 2020 or later
+1. Clone the exercise branch of the repository 
+1. Install the tools in the .vipc file found at the top level of the repository 
+1. If you are new to LUnit, watch the instruction on this [link](https://youtu.be/Cxb1FUIsC04?si=Kdiquu_EesrjtaBA).
 
 The .vipc file will install LUnit and LMock using VIPM. 
 
