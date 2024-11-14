@@ -69,6 +69,7 @@ So lets fix that.
 
 Add a class the the project and call it `MCP23017.lvclass`.
 Create a constructor for the class taking the `I2C Bus.lvclass` interface as an input and wire this into the test as shown below.
+The constructor (Create.vi in image below) is a useful pattern to guarantee that the state of the object is valid, and it also makes finding callers of the class simple in the LabVIEW IDE.
 While at it, maybe rename the test to something more meaningful, such as `Test IODIR Configured as Output on Create.vi`
 
 ![First test attempt 1](./img/Test1-1-final.png)
